@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}BIA Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <h4 class="center-align" style="margin: 2rem 0;">Business Impact Analysis Dashboard</h4>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+        <!-- Total Processes -->
+        <div class="col s12 m6 l3">
+            <div class="card">
+                <div class="card-content center-align">
+                    <span class="card-title">Total Processes</span>
+                    <h3>{{ total_processes }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Critical Processes -->
+        <div class="col s12 m6 l3">
+            <div class="card">
+                <div class="card-content center-align">
+                    <span class="card-title">Critical Processes</span>
+                    <h3>{{ critical_processes }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average RTO -->
+        <div class="col s12 m6 l3">
+            <div class="card">
+                <div class="card-content center-align">
+                    <span class="card-title">Average RTO</span>
+                    <h3>{{ "%.1f"|format(avg_rto) }} hrs</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impact Distribution -->
+        <div class="col s12 m6 l3">
+            <div class="card">
+                <div class="card-content center-align">
+                    <span class="card-title">Impact Distribution</span>
+                    <div style="margin-top: 1rem;">
+                        <p>Critical: {{ impact_distribution.Critical }}</p>
+                        <p>High: {{ impact_distribution.High }}</p>
+                        <p>Medium: {{ impact_distribution.Medium }}</p>
+                        <p>Low: {{ impact_distribution.Low }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Process Table -->
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="row">
+                        <div class="col s6">
+                            <span class="card-title">Business Processes</span>
+                        </div>
+                        <div class="col s6 right-align">
+                            <a href="{{ url_for('main.bia_export') }}" class="btn waves-effect waves-light">
+                                <i class="material-icons left">file_download</i>Export to Excel
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="row" style="margin-bottom: 2rem;">
+                        <div class="col s12 m6">
+                            <label>Department Filter</label>
+                            <select id="departmentFilter" class="browser-default">
+                                <option value="all">All Departments</option>
+                                {% for dept in departments.values() %}
+                                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col s12 m6">
+                            <label>Criticality Filter</label>
+                            <select id="criticalityFilter" class="browser-default">
+                                <option value="all">All Levels</option>
+                                <option value="Critical">Critical</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-container">
+                        <table class="striped">
+                            <thead>
+                                <tr>
+                                    <th>Process Name</th>
+                                    <th>Department</th>
+                                    <th>Description</th>
+                                    <th>RTO</th>
+                                    <th>Criticality</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for process in processes %}
+                                <tr data-department="{{ process.department_id }}" data-criticality="{{ process.criticality_level }}">
+                                    <td>{{ process.name }}</td>
+                                    <td>{{ departments[process.department_id].name }}</td>
+                                    <td>{{ process.description }}</td>
+                                    <td>{{ process.rto_hours }} hours</td>
+                                    <td>{{ process.criticality_level }}</td>
+                                    <td>
+                                        <a href="{{ url_for('main.bia_process_detail', process_id=process.id) }}" class="btn waves-effect waves-light">View Details</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Process FAB -->
+<div class="fixed-action-btn">
+    <a href="{{ url_for('main.bia_add_process') }}" class="btn-floating btn-large waves-effect waves-light">
+        <i class="material-icons">add</i>
+    </a>
+</div>
+
+<!-- JavaScript for Filters -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const departmentFilter = document.getElementById('departmentFilter');
+    const criticalityFilter = document.getElementById('criticalityFilter');
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    function filterTable() {
+        const selectedDepartment = departmentFilter.value;
+        const selectedCriticality = criticalityFilter.value;
+
+        tableRows.forEach(row => {
+            const departmentMatch = selectedDepartment === 'all' || row.dataset.department === selectedDepartment;
+            const criticalityMatch = selectedCriticality === 'all' || row.dataset.criticality === selectedCriticality;
+            
+            row.style.display = departmentMatch && criticalityMatch ? '' : 'none';
+        });
+    }
+
+    departmentFilter.addEventListener('change', filterTable);
+    criticalityFilter.addEventListener('change', filterTable);
+});
+</script>
+{% endblock %}

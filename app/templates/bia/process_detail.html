@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <h4 class="center-align" style="margin: 2rem 0;">Process Details: {{ process.name }}</h4>
+        </div>
+    </div>
+
+    <!-- Basic Information -->
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Basic Information</span>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <p><strong>Department:</strong> {{ departments[process.department_id].name }}</p>
+                            <p><strong>Description:</strong> {{ process.description }}</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <p><strong>RTO:</strong> {{ process.rto_hours }} hours</p>
+                            <p><strong>Criticality Level:</strong> {{ process.criticality_level }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impact Assessment -->
+    {% if impact %}
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Impact Assessment</span>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <p><strong>Financial Impact:</strong> {{ impact.financial_impact }}/4</p>
+                            <p><strong>Operational Impact:</strong> {{ impact.operational_impact }}/4</p>
+                        </div>
+                        <div class="col s12 m6">
+                            <p><strong>Legal Impact:</strong> {{ impact.legal_impact }}/4</p>
+                            <p><strong>Reputational Impact:</strong> {{ impact.reputational_impact }}/4</p>
+                        </div>
+                    </div>
+                    {% if impact.notes %}
+                    <div class="row">
+                        <div class="col s12">
+                            <p><strong>Notes:</strong> {{ impact.notes }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Dependencies -->
+    <div class="row">
+        <!-- Internal Dependencies -->
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Internal Dependencies</span>
+                    {% if internal_deps %}
+                    <ul class="collection">
+                        {% for dep in internal_deps %}
+                        <li class="collection-item">
+                            <div>
+                                {{ departments[dep.dependent_department_id].name }}
+                                <p class="grey-text">{{ dep.description }}</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No internal dependencies</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- External Dependencies -->
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">External Dependencies</span>
+                    {% if external_deps %}
+                    <ul class="collection">
+                        {% for dep in external_deps %}
+                        <li class="collection-item">
+                            <div>
+                                <strong>{{ dep.vendor_name }}</strong>
+                                <p>Service: {{ dep.service_description }}</p>
+                                <p class="grey-text">Contact: {{ dep.contact_info }}</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No external dependencies</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inputs and Outputs -->
+    <div class="row">
+        <!-- Inputs -->
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Process Inputs</span>
+                    {% if inputs %}
+                    <ul class="collection">
+                        {% for input in inputs %}
+                        <li class="collection-item">
+                            <div>
+                                <strong>{{ input.name }}</strong>
+                                <p>Type: {{ input.resource_type }}</p>
+                                <p class="grey-text">{{ input.description }}</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No inputs defined</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Outputs -->
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Process Outputs</span>
+                    {% if outputs %}
+                    <ul class="collection">
+                        {% for output in outputs %}
+                        <li class="collection-item">
+                            <div>
+                                <strong>{{ output.name }}</strong>
+                                <p>Type: {{ output.deliverable_type }}</p>
+                                <p class="grey-text">{{ output.description }}</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No outputs defined</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row center-align" style="margin-top: 2rem;">
+        <div class="col s12">
+            <a href="{{ url_for('main.bia_dashboard') }}" class="btn waves-effect waves-light">
+                <i class="material-icons left">arrow_back</i>Back to Dashboard
+            </a>
+            <a href="{{ url_for('main.bia_edit_process', process_id=process.id) }}" class="btn waves-effect waves-light">
+                <i class="material-icons left">edit</i>Edit Process
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

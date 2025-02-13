@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <h4 class="center-align" style="margin: 2rem 0;">{{ title }}</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Basic Information -->
+                        <div class="row">
+                            <div class="col s12">
+                                <h5>Basic Information</h5>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                {{ form.name.label }}
+                                {{ form.name(class="validate") }}
+                                {% if form.name.errors %}
+                                    {% for error in form.name.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="input-field col s12 m6">
+                                {{ form.department_id.label }}
+                                {{ form.department_id(class="browser-default") }}
+                                {% if form.department_id.errors %}
+                                    {% for error in form.department_id.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="input-field col s12">
+                                {{ form.description.label }}
+                                {{ form.description(class="materialize-textarea") }}
+                                {% if form.description.errors %}
+                                    {% for error in form.description.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="input-field col s12 m6">
+                                {{ form.rto_hours.label }}
+                                {{ form.rto_hours(class="validate", type="number") }}
+                                {% if form.rto_hours.errors %}
+                                    {% for error in form.rto_hours.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="input-field col s12 m6">
+                                {{ form.criticality_level.label }}
+                                {{ form.criticality_level(class="browser-default") }}
+                                {% if form.criticality_level.errors %}
+                                    {% for error in form.criticality_level.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Impact Assessment -->
+                        <div class="row">
+                            <div class="col s12">
+                                <h5>Impact Assessment</h5>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                {{ form.financial_impact.label }}
+                                {{ form.financial_impact(class="validate", type="number", min="0", max="4") }}
+                                {% if form.financial_impact.errors %}
+                                    {% for error in form.financial_impact.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="input-field col s12 m6">
+                                {{ form.operational_impact.label }}
+                                {{ form.operational_impact(class="validate", type="number", min="0", max="4") }}
+                                {% if form.operational_impact.errors %}
+                                    {% for error in form.operational_impact.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="input-field col s12 m6">
+                                {{ form.legal_impact.label }}
+                                {{ form.legal_impact(class="validate", type="number", min="0", max="4") }}
+                                {% if form.legal_impact.errors %}
+                                    {% for error in form.legal_impact.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="input-field col s12 m6">
+                                {{ form.reputational_impact.label }}
+                                {{ form.reputational_impact(class="validate", type="number", min="0", max="4") }}
+                                {% if form.reputational_impact.errors %}
+                                    {% for error in form.reputational_impact.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="input-field col s12">
+                                {{ form.impact_notes.label }}
+                                {{ form.impact_notes(class="materialize-textarea") }}
+                                {% if form.impact_notes.errors %}
+                                    {% for error in form.impact_notes.errors %}
+                                        <span class="helper-text red-text">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="row center-align">
+                            <div class="col s12">
+                                {{ form.submit(class="btn waves-effect waves-light") }}
+                                <a href="{{ url_for('main.bia_dashboard') }}" class="btn waves-effect waves-light red">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

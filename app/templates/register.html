@@ -1,115 +1,162 @@
 {% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card mt-5">
-                <div class="card-header">
-                    <h2 class="text-center">Register</h2>
-                </div>
-                <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                    
-                    <form method="POST" action="">
-                        {{ form.hidden_tag() }}
-                        <div class="form-group mb-3">
-                            {{ form.username.label(class="form-label") }}
+<div class="row" style="margin: 3rem 1rem;">
+    <div class="col s12 m10 offset-m1 l8 offset-l2">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title center-align" style="margin-bottom: 2rem;">Create Account</span>
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    <div class="row" style="margin-bottom: 2rem;">
+                        <div class="input-field col s12 m6">
+                            {{ form.username(class="validate") }}
+                            {{ form.username.label }}
                             {% if form.username.errors %}
-                                {{ form.username(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.username.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.username(class="form-control") }}
+                                {% for error in form.username.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
                             {% endif %}
                         </div>
-                        <div class="form-group mb-3">
-                            {{ form.email.label(class="form-label") }}
+                        <div class="input-field col s12 m6">
+                            {{ form.email(class="validate") }}
+                            {{ form.email.label }}
                             {% if form.email.errors %}
-                                {{ form.email(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.email.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.email(class="form-control") }}
+                                {% for error in form.email.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
                             {% endif %}
                         </div>
-                        <div class="form-group mb-3">
-                            {{ form.department.label(class="form-label") }}
-                            {% if form.department.errors %}
-                                {{ form.department(class="form-select is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.department.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.department(class="form-select") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group mb-3">
-                            {{ form.manager.label(class="form-label") }}
-                            {% if form.manager.errors %}
-                                {{ form.manager(class="form-select is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.manager.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.manager(class="form-select") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group mb-3">
-                            {{ form.password.label(class="form-label") }}
+                    </div>
+                    <div class="row" style="margin-bottom: 2rem;">
+                        <div class="input-field col s12 m6">
+                            {{ form.password(class="validate") }}
+                            {{ form.password.label }}
                             {% if form.password.errors %}
-                                {{ form.password(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.password.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.password(class="form-control") }}
+                                {% for error in form.password.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
                             {% endif %}
                         </div>
-                        <div class="form-group mb-3">
-                            {{ form.confirm_password.label(class="form-label") }}
+                        <div class="input-field col s12 m6">
+                            {{ form.confirm_password(class="validate") }}
+                            {{ form.confirm_password.label }}
                             {% if form.confirm_password.errors %}
-                                {{ form.confirm_password(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.confirm_password.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.confirm_password(class="form-control") }}
+                                {% for error in form.confirm_password.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
                             {% endif %}
                         </div>
-                        <div class="form-group text-center">
-                            {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                    <div class="row" style="margin-bottom: 2rem;">
+                        <div class="input-field col s12 m6">
+                            {{ form.department(class="validate") }}
+                            {{ form.department.label }}
+                            {% if form.department.errors %}
+                                {% for error in form.department.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
                         </div>
-                    </form>
-                </div>
-                <div class="card-footer text-center">
-                    <small class="text-muted">
-                        Already have an account? <a href="{{ url_for('main.login') }}">Sign In</a>
-                    </small>
-                </div>
+                        <div class="input-field col s12 m6">
+                            {{ form.subdepartment(class="validate") }}
+                            {{ form.subdepartment.label }}
+                            {% if form.subdepartment.errors %}
+                                {% for error in form.subdepartment.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom: 2rem;">
+                        <div class="input-field col s12 m6">
+                            {{ form.team(class="validate") }}
+                            {{ form.team.label }}
+                            {% if form.team.errors %}
+                                {% for error in form.team.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="input-field col s12 m6">
+                            {{ form.project(class="validate") }}
+                            {{ form.project.label }}
+                            {% if form.project.errors %}
+                                {% for error in form.project.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 center-align">
+                            {{ form.submit(class="btn waves-effect waves-light") }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-action center-align">
+                <p style="margin: 0;">Already have an account? <a href="{{ url_for('main.login') }}" style="color: var(--secondary-color);">Sign In</a></p>
             </div>
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select dropdowns
+    var selects = document.querySelectorAll('select');
+    M.FormSelect.init(selects);
+
+    // Department change handler
+    var departmentSelect = document.getElementById('department');
+    departmentSelect.addEventListener('change', function() {
+        fetch("{{ url_for('main.get_subdepartments', department_id='') }}" + this.value)
+            .then(response => response.json())
+            .then(data => {
+                var subdepartmentSelect = document.getElementById('subdepartment');
+                subdepartmentSelect.innerHTML = '<option value="0">Select Sub-Department</option>';
+                data.forEach(function(item) {
+                    subdepartmentSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                });
+                M.FormSelect.init(subdepartmentSelect);
+            });
+    });
+
+    // Subdepartment change handler
+    var subdepartmentSelect = document.getElementById('subdepartment');
+    subdepartmentSelect.addEventListener('change', function() {
+        fetch("{{ url_for('main.get_teams', subdepartment_id='') }}" + this.value)
+            .then(response => response.json())
+            .then(data => {
+                var teamSelect = document.getElementById('team');
+                teamSelect.innerHTML = '<option value="0">Select Team</option>';
+                data.forEach(function(item) {
+                    teamSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                });
+                M.FormSelect.init(teamSelect);
+            });
+    });
+
+    // Team change handler
+    var teamSelect = document.getElementById('team');
+    teamSelect.addEventListener('change', function() {
+        fetch("{{ url_for('main.get_projects', team_id='') }}" + this.value)
+            .then(response => response.json())
+            .then(data => {
+                var projectSelect = document.getElementById('project');
+                projectSelect.innerHTML = '<option value="0">Select Project</option>';
+                data.forEach(function(item) {
+                    projectSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                });
+                M.FormSelect.init(projectSelect);
+            });
+    });
+});
+</script>
+{% endblock %}
+
 {% endblock %}

@@ -1,66 +1,56 @@
 {% extends "base.html" %}
 
+{% block title %}Login{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card mt-5">
-                <div class="card-header">
-                    <h2 class="text-center">Login</h2>
-                </div>
-                <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                    
-                    <form method="POST" action="" id="loginForm" class="needs-validation" novalidate>
-                        {{ form.hidden_tag() }}
-                        <div class="form-group mb-3">
+<div class="row" style="margin: 3rem 1rem;">
+    <div class="col s12 m8 offset-m2 l6 offset-l3">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title center-align" style="margin-bottom: 2rem;">Login</span>
+                <form method="POST" action="" id="loginForm" class="needs-validation" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="row" style="margin-bottom: 2rem;">
+                        <div class="input-field col s12">
+                            {{ form.email(class="form-control validate") }}
                             {{ form.email.label(class="form-label") }}
                             {% if form.email.errors %}
-                                {{ form.email(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.email.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.email(class="form-control", placeholder="name@example.com", required=true) }}
+                                {% for error in form.email.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
                             {% endif %}
                         </div>
-                        <div class="form-group mb-3">
+                    </div>
+                    <div class="row" style="margin-bottom: 2rem;">
+                        <div class="input-field col s12">
+                            {{ form.password(class="form-control validate") }}
                             {{ form.password.label(class="form-label") }}
                             {% if form.password.errors %}
-                                {{ form.password(class="form-control is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.password.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.password(class="form-control", placeholder="Password", required=true) }}
+                                {% for error in form.password.errors %}
+                                    <span class="helper-text red-text">{{ error }}</span>
+                                {% endfor %}
                             {% endif %}
                         </div>
-                        <div class="form-check mb-3">
-                            {{ form.remember(class="form-check-input") }}
-                            {{ form.remember.label(class="form-check-label") }}
+                    </div>
+                    <div class="row" style="margin-bottom: 2rem;">
+                        <div class="col s12">
+                            <label>
+                                {{ form.remember(class="filled-in") }}
+                                <span>Remember Me</span>
+                            </label>
                         </div>
-                        <div class="d-grid">
-                            {{ form.submit(class="btn btn-primary btn-lg", id="loginButton") }}
+                    </div>
+                    <div class="row">
+                        <div class="col s12 center-align">
+                            {{ form.submit(class="btn waves-effect waves-light", id="loginButton") }}
                         </div>
-                    </form>
-                </div>
-                <div class="card-footer text-center">
-                    <small class="text-muted">
-                        Need an account? <a href="{{ url_for('main.register') }}">Sign Up</a>
-                    </small>
-                </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-action center-align">
+                <small class="text-muted">
+                    Need an account? <a href="{{ url_for('main.register') }}" style="color: var(--secondary-color);">Sign Up</a>
+                </small>
             </div>
         </div>
     </div>

@@ -1,7 +1,7 @@
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import db, bcrypt
-from app.models import User, Department, Resource
+from app.models import User, Department, Resource, Team, Project, Process, InternalDependency, ProcessStaff, ImpactAssessment
 from app.forms import RegistrationForm, LoginForm
 from app.forms import UpdateUserForm, DepartmentForm, ResourceForm, CSVUploadForm
 from flask import Blueprint
@@ -9,6 +9,10 @@ from datetime import datetime
 import csv
 import io
 from werkzeug.utils import secure_filename
+import xlsxwriter
+from io import BytesIO
+from flask import send_file
+import pandas as pd
 
 bp = Blueprint('main', __name__)
 
@@ -26,26 +30,53 @@ def register():
         return redirect(url_for('main.dashboard'))
     
     form = RegistrationForm()
+    
+    if request.method == 'POST':
+        # Update choices based on the selected values
+        if form.department.data:
+            subdepartments = Department.query.filter_by(
+                parent_id=form.department.data,
+                department_type='subdepartment'
+            ).all()
+            form.subdepartment.choices = [(0, 'Select Sub-Department')] + [(d.id, d.name) for d in subdepartments]
+        
+        if form.subdepartment.data:
+            teams = Team.query.filter_by(department_id=form.subdepartment.data).all()
+            form.team.choices = [(0, 'Select Team')] + [(t.id, t.name) for t in teams]
+        
+        if form.team.data:
+            projects = Project.query.filter_by(team_id=form.team.data, status='active').all()
+            form.project.choices = [(0, 'Select Project')] + [(p.id, p.name) for p in projects]
+
     if form.validate_on_submit():
         user = User(
             username=form.username.data,
             email=form.email.data,
             role='USER',  # Only regular users can register
-            department_id=form.department.data,
-            manager_id=form.manager.data,
+            department_id=form.subdepartment.data,  # Use subdepartment as the user's department
             join_date=datetime.utcnow()
         )
         user.set_password(form.password.data)
         
         try:
+            # Add user to database
             db.session.add(user)
             db.session.commit()
+
+            # Add user to selected team and set manager
+            team = Team.query.get(form.team.data)
+            if team:
+                team.team_members.append(user)
+                user.current_project_id = form.project.data
+                # Set the team leader as the user's manager
+                user.manager_id = team.leader_id
+                db.session.commit()
+
             flash('Your account has been created! You can now log in.', 'success')
             return redirect(url_for('main.login'))
         except Exception as e:
             db.session.rollback()
             flash('An error occurred while creating your account. Please try again.', 'danger')
-            # app.logger.error(f"Error creating user: {str(e)}")
     
     return render_template('register.html', title='Register', form=form)
 
@@ -225,7 +256,7 @@ def edit_department(dept_id):
     if form.validate_on_submit():
         department.name = form.name.data
         department.description = form.description.data
-        department.head_id = form.head.data
+        department.head_id = form.head.data if form.head.data != 0 else None
         if current_user.role == 'MASTER_ADMIN':
             department.parent_id = form.parent.data
         db.session.commit()
@@ -426,3 +457,320 @@ def upload_csv():
     return render_template('admin/upload_csv.html', 
                          title='Upload CSV',
                          form=form)
+
+@bp.route("/get_managers/<int:department_id>")
+def get_managers(department_id):
+    if not department_id:
+        return jsonify([])
+    
+    # Get managers (DEPT_ADMIN and ORG_ADMIN) from the selected department
+    managers = User.query.filter(
+        (User.role.in_(['DEPT_ADMIN', 'ORG_ADMIN'])) & 
+        ((User.department_id == department_id) | (User.role == 'ORG_ADMIN'))
+    ).all()
+    
+    return jsonify([{
+        'id': manager.id,
+        'name': f"{manager.username} ({manager.role})"
+    } for manager in managers])
+
+@bp.route("/get_subdepartments/<int:department_id>")
+def get_subdepartments(department_id):
+    if not department_id:
+        return jsonify([])
+    
+    subdepartments = Department.query.filter_by(
+        parent_id=department_id,
+        department_type='subdepartment'
+    ).all()
+    
+    return jsonify([{
+        'id': dept.id,
+        'name': dept.name
+    } for dept in subdepartments])
+
+@bp.route("/get_teams/<int:subdepartment_id>")
+def get_teams(subdepartment_id):
+    if not subdepartment_id:
+        return jsonify([])
+    
+    teams = Team.query.filter_by(department_id=subdepartment_id).all()
+    
+    return jsonify([{
+        'id': team.id,
+        'name': team.name
+    } for team in teams])
+
+@bp.route("/get_projects/<int:team_id>")
+def get_projects(team_id):
+    if not team_id:
+        return jsonify([])
+    
+    projects = Project.query.filter_by(
+        team_id=team_id,
+        status='active'
+    ).all()
+    
+    return jsonify([{
+        'id': project.id,
+        'name': project.name
+    } for project in projects])
+
+@bp.route('/bia/processes')
+@login_required
+def bia_processes():
+    processes = Process.query.all()
+    return render_template('bia/processes.html', processes=processes)
+
+@bp.route('/bia/process/<int:process_id>')
+@login_required
+def bia_process_detail(process_id):
+    process = Process.query.get_or_404(process_id)
+    departments = {dept.id: dept for dept in Department.query.all()}
+    
+    # Get related data
+    internal_deps = process.internal_dependencies.all()
+    external_deps = process.external_dependencies.all()
+    inputs = process.inputs.all()
+    outputs = process.outputs.all()
+    impact = process.impact_assessment
+    
+    return render_template('bia/process_detail.html',
+                         process=process,
+                         departments=departments,
+                         internal_deps=internal_deps,
+                         external_deps=external_deps,
+                         inputs=inputs,
+                         outputs=outputs,
+                         impact=impact)
+
+@bp.route('/bia/process/new', methods=['GET', 'POST'])
+@login_required
+def bia_process_new():
+    if request.method == 'POST':
+        process = Process(
+            name=request.form['name'],
+            department_id=request.form['department_id'],
+            description=request.form['description'],
+            rto_hours=request.form['rto_hours'],
+            criticality_level=request.form['criticality_level']
+        )
+        db.session.add(process)
+        db.session.commit()
+        
+        # Add dependencies
+        for dep_id in request.form.getlist('internal_dependencies'):
+            dependency = InternalDependency(
+                process_id=process.id,
+                dependent_department_id=dep_id
+            )
+            db.session.add(dependency)
+        
+        # Add staff
+        for staff_id in request.form.getlist('staff'):
+            staff = ProcessStaff(
+                process_id=process.id,
+                user_id=staff_id,
+                role=request.form.get(f'staff_role_{staff_id}'),
+                is_primary=request.form.get(f'staff_primary_{staff_id}') == 'on'
+            )
+            db.session.add(staff)
+        
+        db.session.commit()
+        return redirect(url_for('main.bia_process_detail', process_id=process.id))
+    
+    departments = Department.query.all()
+    users = User.query.all()
+    return render_template('bia/process_form.html', departments=departments, users=users)
+
+@bp.route('/bia/process/<int:process_id>/impact', methods=['GET', 'POST'])
+@login_required
+def bia_impact_assessment(process_id):
+    process = Process.query.get_or_404(process_id)
+    if request.method == 'POST':
+        impact = ImpactAssessment(
+            process_id=process.id,
+            financial_impact=request.form['financial_impact'],
+            operational_impact=request.form['operational_impact'],
+            legal_impact=request.form['legal_impact'],
+            reputational_impact=request.form['reputational_impact'],
+            notes=request.form['notes']
+        )
+        db.session.add(impact)
+        db.session.commit()
+        return redirect(url_for('main.bia_process_detail', process_id=process.id))
+    
+    return render_template('bia/impact_assessment.html', process=process)
+
+@bp.route('/bia/dashboard')
+@login_required
+def bia_dashboard():
+    processes = Process.query.all()
+    departments = {dept.id: dept for dept in Department.query.all()}
+    
+    # Calculate statistics
+    total_processes = len(processes)
+    critical_processes = len([p for p in processes if p.criticality_level == 'Critical'])
+    avg_rto = sum(p.rto_hours for p in processes) / total_processes if total_processes > 0 else 0
+    
+    # Get impact distribution
+    impact_distribution = {
+        'Critical': len([p for p in processes if p.criticality_level == 'Critical']),
+        'High': len([p for p in processes if p.criticality_level == 'High']),
+        'Medium': len([p for p in processes if p.criticality_level == 'Medium']),
+        'Low': len([p for p in processes if p.criticality_level == 'Low'])
+    }
+    
+    return render_template('bia/dashboard.html',
+                         processes=processes,
+                         departments=departments,
+                         total_processes=total_processes,
+                         critical_processes=critical_processes,
+                         avg_rto=avg_rto,
+                         impact_distribution=impact_distribution)
+
+@bp.route('/bia/export')
+@login_required
+def bia_export():
+    import pandas as pd
+    from io import BytesIO
+    
+    # Get all processes and departments
+    processes = Process.query.all()
+    departments = {dept.id: dept.name for dept in Department.query.all()}
+    
+    # Prepare data for export
+    data = []
+    for process in processes:
+        impact = process.impact_assessment
+        impact_data = {
+            'financial_impact': impact.financial_impact if impact else None,
+            'operational_impact': impact.operational_impact if impact else None,
+            'legal_impact': impact.legal_impact if impact else None,
+            'reputational_impact': impact.reputational_impact if impact else None,
+            'impact_notes': impact.notes if impact else None
+        } if process.impact_assessment else {}
+        
+        process_data = {
+            'Process Name': process.name,
+            'Department': departments.get(process.department_id, 'Unknown'),
+            'Description': process.description,
+            'RTO (hours)': process.rto_hours,
+            'Criticality Level': process.criticality_level,
+            'Financial Impact': impact_data.get('financial_impact'),
+            'Operational Impact': impact_data.get('operational_impact'),
+            'Legal Impact': impact_data.get('legal_impact'),
+            'Reputational Impact': impact_data.get('reputational_impact'),
+            'Impact Notes': impact_data.get('impact_notes')
+        }
+        data.append(process_data)
+    
+    # Create DataFrame and export to Excel
+    df = pd.DataFrame(data)
+    
+    # Create Excel file in memory
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='BIA Processes')
+        
+        # Auto-adjust columns' width
+        worksheet = writer.sheets['BIA Processes']
+        for idx, col in enumerate(df.columns):
+            max_length = max(
+                df[col].astype(str).apply(len).max(),
+                len(str(col))
+            ) + 2
+            worksheet.column_dimensions[chr(65 + idx)].width = min(max_length, 50)
+    
+    output.seek(0)
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='bia_processes.xlsx'
+    )
+
+@bp.route('/bia/process/add', methods=['GET', 'POST'])
+@login_required
+def bia_add_process():
+    form = ProcessForm()
+    form.department_id.choices = [(d.id, d.name) for d in Department.query.all()]
+    
+    if form.validate_on_submit():
+        process = Process(
+            name=form.name.data,
+            description=form.description.data,
+            department_id=form.department_id.data,
+            rto_hours=form.rto_hours.data,
+            criticality_level=form.criticality_level.data
+        )
+        db.session.add(process)
+        db.session.commit()
+        
+        # Add impact assessment
+        impact = ImpactAssessment(
+            process_id=process.id,
+            financial_impact=form.financial_impact.data,
+            operational_impact=form.operational_impact.data,
+            legal_impact=form.legal_impact.data,
+            reputational_impact=form.reputational_impact.data,
+            notes=form.impact_notes.data
+        )
+        db.session.add(impact)
+        db.session.commit()
+        
+        flash('Process added successfully!', 'success')
+        return redirect(url_for('main.bia_dashboard'))
+    
+    return render_template('bia/process_form.html', 
+                         form=form,
+                         title='Add New Process')
+
+@bp.route('/bia/process/<int:process_id>/edit', methods=['GET', 'POST'])
+@login_required
+def bia_edit_process(process_id):
+    process = Process.query.get_or_404(process_id)
+    form = ProcessForm(obj=process)
+    form.department_id.choices = [(d.id, d.name) for d in Department.query.all()]
+    
+    if form.validate_on_submit():
+        process.name = form.name.data
+        process.description = form.description.data
+        process.department_id = form.department_id.data
+        process.rto_hours = form.rto_hours.data
+        process.criticality_level = form.criticality_level.data
+        
+        # Update impact assessment
+        if process.impact_assessment:
+            process.impact_assessment.financial_impact = form.financial_impact.data
+            process.impact_assessment.operational_impact = form.operational_impact.data
+            process.impact_assessment.legal_impact = form.legal_impact.data
+            process.impact_assessment.reputational_impact = form.reputational_impact.data
+            process.impact_assessment.notes = form.impact_notes.data
+        else:
+            impact = ImpactAssessment(
+                process_id=process.id,
+                financial_impact=form.financial_impact.data,
+                operational_impact=form.operational_impact.data,
+                legal_impact=form.legal_impact.data,
+                reputational_impact=form.reputational_impact.data,
+                notes=form.impact_notes.data
+            )
+            db.session.add(impact)
+        
+        db.session.commit()
+        flash('Process updated successfully!', 'success')
+        return redirect(url_for('main.bia_process_detail', process_id=process.id))
+    
+    # Pre-populate form with existing data
+    if process.impact_assessment:
+        form.financial_impact.data = process.impact_assessment.financial_impact
+        form.operational_impact.data = process.impact_assessment.operational_impact
+        form.legal_impact.data = process.impact_assessment.legal_impact
+        form.reputational_impact.data = process.impact_assessment.reputational_impact
+        form.impact_notes.data = process.impact_assessment.notes
+    
+    return render_template('bia/process_form.html',
+                         form=form,
+                         title='Edit Process')
