@@ -9,26 +9,12 @@ class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    role = SelectField('Role', choices=[('student', 'Student'), ('company', 'Company')])
-    
-    # Additional fields for companies
-    company_name = StringField('Company Name')
-    description = TextAreaField('Company Description', default='')
     
     submit = SubmitField('Sign Up')
 
     def validate(self, extra_validators=None):
         if not super().validate():
             return False
-            
-        if self.role.data == 'company':
-            if not self.company_name.data:
-                self.company_name.errors = ['Company name is required']
-                return False
-            if not self.description.data:
-                self.description.errors = ['Company description is required']
-                return False
-        return True
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
