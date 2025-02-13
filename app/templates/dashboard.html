@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- User Profile Card -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column">
+                        <div class="mb-3 text-center">
+                            <img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" alt="Profile Picture" class="rounded-circle" style="width: 150px; height: 150px;">
+                        </div>
+                        <h4 class="text-center mb-3">{{ user_data.username }}</h4>
+                        <p><strong>Email:</strong> {{ user_data.email }}</p>
+                        <p><strong>Role:</strong> {{ user_data.role }}</p>
+                        <p><strong>Department:</strong> {{ user_data.department }}</p>
+                        <p><strong>Manager:</strong> {{ user_data.manager }}</p>
+                        {% if user_data.department_head %}
+                        <p><strong>Department Head:</strong> {{ user_data.department_head }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Info and Team Members -->
+        <div class="col-md-8">
+            {% if user_data.department %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Department Information</h5>
+                </div>
+                <div class="card-body">
+                    <h5>{{ user_data.department }}</h5>
+                    <p>{{ user_data.department_description }}</p>
+                    <p><strong>Total Members:</strong> {{ user_data.department_members }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if team_members %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Team Members</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in team_members %}
+                                <tr>
+                                    <td>{{ member.username }}</td>
+                                    <td>{{ member.email }}</td>
+                                    <td>{{ member.department.name if member.department else 'No Department' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Resources Section -->
+    <div class="row">
+        <!-- Assigned Resources -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">My Resources</h5>
+                </div>
+                <div class="card-body">
+                    {% if assigned_resources %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for resource in assigned_resources %}
+                                <tr>
+                                    <td>{{ resource.name }}</td>
+                                    <td>{{ resource.type }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if resource.status == 'available' else 'warning' }}">
+                                            {{ resource.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No resources assigned.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Resources -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Available Resources</h5>
+                </div>
+                <div class="card-body">
+                    {% if resources %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Department</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for resource in resources %}
+                                {% if resource.status == 'available' %}
+                                <tr>
+                                    <td>{{ resource.name }}</td>
+                                    <td>{{ resource.type }}</td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            {{ resource.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ resource.department.name if resource.department else 'No Department' }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No available resources.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Actions -->
+    {% if current_user.role in ['MASTER_ADMIN', 'ORG_ADMIN'] %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Administrative Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{{ url_for('main.manage_users') }}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-users"></i> Manage Users
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('main.manage_departments') }}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-building"></i> Manage Departments
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('main.manage_resources') }}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-box"></i> Manage Resources
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('main.upload_csv') }}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-file-csv"></i> Upload CSV Data
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

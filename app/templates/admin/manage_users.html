@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Manage Users</h4>
+            {% if current_user.role == 'MASTER_ADMIN' %}
+            <a href="{{ url_for('main.register') }}" class="btn btn-light">Add New User</a>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.role }}</td>
+                            <td>{{ user.department.name if user.department else 'No Department' }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if user.is_active else 'danger' }}">
+                                    {{ 'Active' if user.is_active else 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('main.edit_user', user_id=user.id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                {% if current_user.role == 'MASTER_ADMIN' %}
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

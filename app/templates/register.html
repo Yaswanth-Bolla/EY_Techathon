@@ -1,124 +1,115 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h2>Register</h2>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="">
-                    {{ form.hidden_tag() }}
-                    <div class="mb-3">
-                        {{ form.username.label(class="form-label") }}
-                        {{ form.username(class="form-control") }}
-                        {% if form.username.errors %}
-                            <div class="text-danger">
-                                {% for error in form.username.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h2 class="text-center">Register</h2>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
                         {% endif %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.email.label(class="form-label") }}
-                        {{ form.email(class="form-control") }}
-                        {% if form.email.errors %}
-                            <div class="text-danger">
-                                {% for error in form.email.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control") }}
-                        {% if form.password.errors %}
-                            <div class="text-danger">
-                                {% for error in form.password.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.confirm_password.label(class="form-label") }}
-                        {{ form.confirm_password(class="form-control") }}
-                        {% if form.confirm_password.errors %}
-                            <div class="text-danger">
-                                {% for error in form.confirm_password.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.role.label(class="form-label") }}
-                        {{ form.role(class="form-select") }}
-                        {% if form.role.errors %}
-                            <div class="text-danger">
-                                {% for error in form.role.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% endwith %}
                     
-                    <div id="company-fields" style="display: none;">
-                        <div class="mb-3">
-                            {{ form.company_name.label(class="form-label") }}
-                            {{ form.company_name(class="form-control") }}
-                            {% if form.company_name.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.company_name.errors %}
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {% if form.username.errors %}
+                                {{ form.username(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.username.errors %}
                                         <span>{{ error }}</span>
                                     {% endfor %}
                                 </div>
+                            {% else %}
+                                {{ form.username(class="form-control") }}
                             {% endif %}
                         </div>
-                        <div class="mb-3">
-                            {{ form.description.label(class="form-label") }}
-                            {{ form.description(class="form-control", rows="4") }}
-                            {% if form.description.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.description.errors %}
+                        <div class="form-group mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {% if form.email.errors %}
+                                {{ form.email(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
                                         <span>{{ error }}</span>
                                     {% endfor %}
                                 </div>
+                            {% else %}
+                                {{ form.email(class="form-control") }}
                             {% endif %}
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.submit(class="btn btn-primary") }}
-                    </div>
-                </form>
-                <div class="border-top pt-3">
+                        <div class="form-group mb-3">
+                            {{ form.department.label(class="form-label") }}
+                            {% if form.department.errors %}
+                                {{ form.department(class="form-select is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.department.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.department(class="form-select") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ form.manager.label(class="form-label") }}
+                            {% if form.manager.errors %}
+                                {{ form.manager(class="form-select is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.manager.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.manager(class="form-select") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {% if form.password.errors %}
+                                {{ form.password(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.password(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ form.confirm_password.label(class="form-label") }}
+                            {% if form.confirm_password.errors %}
+                                {{ form.confirm_password(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.confirm_password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.confirm_password(class="form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group text-center">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
                     <small class="text-muted">
-                        Already Have An Account? <a class="ml-2" href="{{ url_for('main.login') }}">Sign In</a>
+                        Already have an account? <a href="{{ url_for('main.login') }}">Sign In</a>
                     </small>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const roleSelect = document.querySelector('#role');
-    const companyFields = document.querySelector('#company-fields');
-
-    function toggleCompanyFields() {
-        if (roleSelect.value === 'company') {
-            companyFields.style.display = 'block';
-        } else {
-            companyFields.style.display = 'none';
-        }
-    }
-
-    roleSelect.addEventListener('change', toggleCompanyFields);
-    toggleCompanyFields(); // Call once on page load
-});
-</script>
-{% endblock content %}
+{% endblock %}

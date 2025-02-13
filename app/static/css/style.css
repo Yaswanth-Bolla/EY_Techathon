@@ -1,0 +1,233 @@
+/* EY Theme Colors */
+:root {
+    --ey-black: #000000;
+    --ey-yellow: #FFE600;
+    --ey-gray: #2B2B2B;
+    --ey-light-gray: #F5F5F5;
+}
+
+/* Override Bootstrap Base */
+body {
+    background-color: var(--ey-black);
+    color: var(--ey-yellow);
+}
+
+/* Override all Bootstrap buttons */
+.btn {
+    background-color: var(--ey-black) !important;
+    border: 2px solid var(--ey-yellow) !important;
+    color: var(--ey-yellow) !important;
+}
+
+.btn:hover {
+    background-color: var(--ey-yellow) !important;
+    color: var(--ey-black) !important;
+}
+
+/* Override all Bootstrap cards */
+.card {
+    background-color: var(--ey-black) !important;
+    border: 1px solid var(--ey-yellow) !important;
+    color: var(--ey-yellow) !important;
+}
+
+.card-header {
+    background-color: var(--ey-yellow) !important;
+    color: var(--ey-black) !important;
+    border-bottom: none !important;
+}
+
+.card-body {
+    background-color: var(--ey-black);
+}
+
+.card-footer {
+    background-color: var(--ey-black);
+    border-top: 1px solid var(--ey-yellow);
+}
+
+/* Override all Bootstrap tables */
+.table {
+    color: var(--ey-yellow) !important;
+}
+
+.table thead th {
+    background-color: var(--ey-yellow) !important;
+    color: var(--ey-black) !important;
+    border-color: var(--ey-yellow) !important;
+}
+
+.table td, .table th {
+    border-color: var(--ey-yellow) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--ey-gray) !important;
+    color: var(--ey-yellow) !important;
+}
+
+/* Override all Bootstrap forms */
+.form-control {
+    background-color: var(--ey-black) !important;
+    border: 2px solid var(--ey-yellow) !important;
+    color: var(--ey-yellow) !important;
+}
+
+.form-control:focus {
+    background-color: var(--ey-black);
+    border-color: var(--ey-yellow);
+    box-shadow: 0 0 0 0.2rem rgba(255, 230, 0, 0.25);
+    color: var(--ey-yellow);
+}
+
+.form-control::placeholder {
+    color: var(--ey-yellow);
+    opacity: 0.5;
+}
+
+.form-label {
+    color: var(--ey-yellow);
+}
+
+/* Override all Bootstrap navbars */
+.navbar {
+    background-color: var(--ey-black) !important;
+    border-bottom: 2px solid var(--ey-yellow);
+}
+
+.navbar-brand, .nav-link {
+    color: var(--ey-yellow) !important;
+}
+
+.navbar-toggler {
+    border-color: var(--ey-yellow) !important;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FFE600' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+/* Override all Bootstrap badges */
+.badge {
+    background-color: var(--ey-yellow) !important;
+    color: var(--ey-black) !important;
+}
+
+/* Override all Bootstrap alerts */
+.alert {
+    background-color: var(--ey-black);
+    border: 1px solid var(--ey-yellow);
+    color: var(--ey-yellow);
+}
+
+/* Override all Bootstrap list groups */
+.list-group-item {
+    background-color: var(--ey-black);
+    border-color: var(--ey-yellow);
+    color: var(--ey-yellow);
+}
+
+/* Override all Bootstrap modals */
+.modal-content {
+    background-color: var(--ey-black);
+    border: 2px solid var(--ey-yellow);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--ey-yellow);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--ey-yellow);
+}
+
+/* Override all Bootstrap dropdowns */
+.dropdown-menu {
+    background-color: var(--ey-black);
+    border: 1px solid var(--ey-yellow);
+}
+
+.dropdown-item {
+    color: var(--ey-yellow);
+}
+
+.dropdown-item:hover {
+    background-color: var(--ey-yellow);
+    color: var(--ey-black);
+}
+
+/* Override all Bootstrap pagination */
+.page-link {
+    background-color: var(--ey-black);
+    border-color: var(--ey-yellow);
+    color: var(--ey-yellow);
+}
+
+.page-item.active .page-link {
+    background-color: var(--ey-yellow);
+    border-color: var(--ey-yellow);
+    color: var(--ey-black);
+}
+
+/* Override all Bootstrap backgrounds */
+.bg-primary, .bg-secondary, .bg-success, .bg-danger, .bg-warning, .bg-info, .bg-light, .bg-dark {
+    background-color: var(--ey-black) !important;
+    color: var(--ey-yellow) !important;
+}
+
+/* Override all Bootstrap text colors */
+.text-primary, .text-secondary, .text-success, .text-danger, .text-warning, .text-info, .text-light, .text-dark {
+    color: var(--ey-yellow) !important;
+}
+
+/* Override all Bootstrap borders */
+.border, .border-top, .border-right, .border-bottom, .border-left {
+    border-color: var(--ey-yellow) !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--ey-black);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ey-yellow);
+    border-radius: 4px;
+}
+
+/* Links */
+a {
+    color: var(--ey-yellow);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--ey-yellow);
+    text-decoration: underline;
+}
+
+/* Icons */
+.fas, .far, .fab, .fa {
+    color: var(--ey-yellow);
+}
+
+/* Input placeholders */
+::placeholder {
+    color: var(--ey-yellow) !important;
+    opacity: 0.5 !important;
+}
+
+/* Selection color */
+::selection {
+    background-color: var(--ey-yellow);
+    color: var(--ey-black);
+}
+
+/* Focus outline */
+*:focus {
+    outline-color: var(--ey-yellow) !important;
+}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Upload CSV Data</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.upload_type.label(class="form-label") }}
+                            {{ form.upload_type(class="form-select") }}
+                            {% if form.upload_type.errors %}
+                                {% for error in form.upload_type.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.file.label(class="form-label") }}
+                            {{ form.file(class="form-control") }}
+                            {% if form.file.errors %}
+                                {% for error in form.file.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>CSV Format Guidelines:</h5>
+                        <div class="accordion" id="csvGuidelinesAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#usersFormat">
+                                        Users CSV Format
+                                    </button>
+                                </h2>
+                                <div id="usersFormat" class="accordion-collapse collapse" data-bs-parent="#csvGuidelinesAccordion">
+                                    <div class="accordion-body">
+                                        <p>Required columns:</p>
+                                        <ul>
+                                            <li>username</li>
+                                            <li>email</li>
+                                        </ul>
+                                        <p>Optional columns:</p>
+                                        <ul>
+                                            <li>role (defaults to REGULAR_USER)</li>
+                                            <li>department_id</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#departmentsFormat">
+                                        Departments CSV Format
+                                    </button>
+                                </h2>
+                                <div id="departmentsFormat" class="accordion-collapse collapse" data-bs-parent="#csvGuidelinesAccordion">
+                                    <div class="accordion-body">
+                                        <p>Required columns:</p>
+                                        <ul>
+                                            <li>name</li>
+                                        </ul>
+                                        <p>Optional columns:</p>
+                                        <ul>
+                                            <li>description</li>
+                                            <li>head_id</li>
+                                            <li>parent_id</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#resourcesFormat">
+                                        Resources CSV Format
+                                    </button>
+                                </h2>
+                                <div id="resourcesFormat" class="accordion-collapse collapse" data-bs-parent="#csvGuidelinesAccordion">
+                                    <div class="accordion-body">
+                                        <p>Required columns:</p>
+                                        <ul>
+                                            <li>name</li>
+                                            <li>type</li>
+                                            <li>department_id</li>
+                                        </ul>
+                                        <p>Optional columns:</p>
+                                        <ul>
+                                            <li>status (defaults to 'available')</li>
+                                            <li>assigned_to_id</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

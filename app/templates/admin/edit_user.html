@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Edit User</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control") }}
+                            {% if form.username.errors %}
+                                {% for error in form.username.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control") }}
+                            {% if form.email.errors %}
+                                {% for error in form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        {% if current_user.role == 'MASTER_ADMIN' %}
+                        <div class="mb-3">
+                            {{ form.role.label(class="form-label") }}
+                            {{ form.role(class="form-select") }}
+                        </div>
+                        {% endif %}
+                        <div class="mb-3">
+                            {{ form.department.label(class="form-label") }}
+                            {{ form.department(class="form-select") }}
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ url_for('main.manage_users') }}" class="btn btn-secondary">Cancel</a>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
