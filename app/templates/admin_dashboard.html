@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Companies</h5>
+                    <h2 class="card-text">{{ companies|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Students</h5>
+                    <h2 class="card-text">{{ students|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Active Jobs</h5>
+                    <h2 class="card-text">{{ jobs|selectattr('is_active', 'equalto', true)|list|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Applications</h5>
+                    <h2 class="card-text">{{ applications|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Company Approvals -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Pending Company Approvals</h3>
+        </div>
+        <div class="card-body">
+            {% if pending_companies %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Description</th>
+                                <th>Registration Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for company in pending_companies %}
+                            <tr>
+                                <td>{{ company.company_name }}</td>
+                                <td>{{ company.description[:100] }}...</td>
+                                <td>{{ company.user.date_joined.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <form action="{{ url_for('main.approve_company', company_id=company.id) }}" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                        </form>
+                                        <form action="{{ url_for('main.reject_company', company_id=company.id) }}" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No pending company approvals.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Job Listings -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Recent Job Listings</h3>
+        </div>
+        <div class="card-body">
+            {% if jobs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Company</th>
+                                <th>Category</th>
+                                <th>Applications</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs %}
+                            <tr>
+                                <td>{{ job.title }}</td>
+                                <td>{{ job.company.company_name }}</td>
+                                <td>{{ job.category|title }}</td>
+                                <td>{{ job.applications|length }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if job.is_active else 'secondary' }}">
+                                        {{ 'Active' if job.is_active else 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <form action="{{ url_for('main.toggle_job_status', job_id=job.id) }}" method="POST">
+                                            <button type="submit" class="btn btn-sm btn-{{ 'danger' if job.is_active else 'success' }}">
+                                                {{ 'Deactivate' if job.is_active else 'Activate' }}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No job listings found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Applications -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="mb-0">Recent Applications</h3>
+        </div>
+        <div class="card-body">
+            {% if applications %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Applied Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applications %}
+                            <tr>
+                                <td>{{ application.student.username }}</td>
+                                <td>{{ application.job_listing.title }}</td>
+                                <td>{{ application.company.company_name }}</td>
+                                <td>{{ application.date_of_application.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ {
+                                        'applied': 'primary',
+                                        'shortlisted': 'info',
+                                        'interviewed': 'warning',
+                                        'selected': 'success',
+                                        'rejected': 'danger'
+                                    }[application.status] }}">
+                                        {{ application.status|title }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No applications found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

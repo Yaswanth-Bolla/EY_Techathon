@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Service Request Details</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Service Details -->
+                    <div class="mb-4">
+                        <h4>Service Information</h4>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ request.service.name }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ request.service.category|title }}</h6>
+                                <p class="card-text">{{ request.service.description }}</p>
+                                <ul class="list-unstyled">
+                                    <li><strong>Price:</strong> ${{ "%.2f"|format(request.service.base_price) }}</li>
+                                    <li><strong>Time Required:</strong> {{ request.service.time_required }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Request Details -->
+                    <div class="mb-4">
+                        <h4>Request Information</h4>
+                        <table class="table">
+                            <tr>
+                                <th>Status:</th>
+                                <td>
+                                    <span class="badge bg-{{ {
+                                        'requested': 'warning',
+                                        'assigned': 'info',
+                                        'in_progress': 'primary',
+                                        'completed': 'success',
+                                        'cancelled': 'danger'
+                                    }[request.status] }}">
+                                        {{ request.status|title }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Customer:</th>
+                                <td>{{ request.customer.username }}</td>
+                            </tr>
+                            <tr>
+                                <th>Professional:</th>
+                                <td>{{ request.service_professional.user.username if request.service_professional else 'Not Assigned' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Location:</th>
+                                <td>{{ request.location }}</td>
+                            </tr>
+                            <tr>
+                                <th>Requested Date:</th>
+                                <td>{{ request.date_of_request.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            <tr>
+                                <th>Preferred Date:</th>
+                                <td>{{ request.preferred_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% if request.date_of_completion %}
+                            <tr>
+                                <th>Completed Date:</th>
+                                <td>{{ request.date_of_completion.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if request.remarks %}
+                            <tr>
+                                <th>Remarks:</th>
+                                <td>{{ request.remarks }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if request.price_quoted %}
+                            <tr>
+                                <th>Quoted Price:</th>
+                                <td>${{ "%.2f"|format(request.price_quoted) }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        {% if request.status in ['requested', 'assigned'] %}
+                            <a href="{{ url_for('main.cancel_request', request_id=request.id) }}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Are you sure you want to cancel this request?')">
+                                Cancel Request
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('main.' + (current_user.role + '_dashboard')) }}" 
+                           class="btn btn-secondary">Back to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %} 

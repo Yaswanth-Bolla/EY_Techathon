@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+Flask-WTF
+Jinja2
+Bootstrap-Flask
+Flask_login
+Flask_bcrypt

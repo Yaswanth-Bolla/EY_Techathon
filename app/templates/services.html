@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Available Jobs</h2>
+    
+    <!-- Service Categories -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form method="GET" class="mb-3">
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('main.services') }}" 
+                       class="btn btn-{{ 'primary' if not request.args.get('category') else 'outline-primary' }}">
+                        All Services
+                    </a>
+                    {% for category in ['plumbing', 'electrical', 'carpentry', 'cleaning', 'painting', 'ac_repair', 'appliance_repair'] %}
+                        <a href="{{ url_for('main.services', category=category) }}" 
+                           class="btn btn-{{ 'primary' if request.args.get('category') == category else 'outline-primary' }}">
+                            {{ category|title }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Services List -->
+    <div class="row">
+        {% if services %}
+            {% for service in services %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ service.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ service.category|title }}</h6>
+                        <p class="card-text">{{ service.description }}</p>
+                        <ul class="list-unstyled">
+                            <li><strong>Price:</strong> ${{ "%.2f"|format(service.base_price) }}</li>
+                            <li><strong>Time Required:</strong> {{ service.time_required }}</li>
+                            <li><strong>Professional:</strong> {{ service.professional.user.username }}</li>
+                        </ul>
+                        {% if current_user.is_authenticated and current_user.role == 'customer' %}
+                        <a href="{{ url_for('main.request_service', service_id=service.id) }}" 
+                           class="btn btn-primary">Request Service</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No services available at the moment.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %} 

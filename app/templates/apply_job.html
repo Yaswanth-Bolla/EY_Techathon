@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Job Details -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="mb-0">Job Details</h3>
+                </div>
+                <div class="card-body">
+                    <h4>{{ job.title }}</h4>
+                    <h6 class="text-muted">{{ job.company.company_name }}</h6>
+                    
+                    <hr>
+                    
+                    <p><strong>Description:</strong><br>
+                    {{ job.description }}</p>
+                    
+                    <p><strong>Required Skills:</strong><br>
+                    {{ job.required_skills }}</p>
+                    
+                    <p><strong>Salary Range:</strong><br>
+                    {{ job.salary_range }}</p>
+                    
+                    <p><strong>Category:</strong><br>
+                    {{ job.category|title }}</p>
+                    
+                    <p class="text-muted">Posted on {{ job.created_at.strftime('%Y-%m-%d') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Form -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Apply for this Position</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.resume_link.label(class="form-label") }}
+                            {{ form.resume_link(class="form-control") }}
+                            {% if form.resume_link.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.resume_link.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">Please provide a link to your resume (Google Drive, Dropbox, etc.)</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.expected_salary.label(class="form-label") }}
+                            {{ form.expected_salary(class="form-control") }}
+                            {% if form.expected_salary.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.expected_salary.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.remarks.label(class="form-label") }}
+                            {{ form.remarks(class="form-control", rows="6") }}
+                            {% if form.remarks.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.remarks.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">Use this space for your cover letter or any additional information you'd like to share.</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('main.jobs') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

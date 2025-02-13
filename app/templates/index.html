@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4">Find Your Dream Career</h1>
+        <p class="lead mb-4">Connect with top companies and discover exciting job opportunities</p>
+        {% if not current_user.is_authenticated %}
+            <div class="mb-4">
+                <a href="{{ url_for('main.register') }}" class="btn btn-primary btn-lg me-2">Sign Up</a>
+                <a href="{{ url_for('main.login') }}" class="btn btn-outline-primary btn-lg">Login</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Featured Jobs Section -->
+<div class="container">
+    <h2 class="mb-4">Featured Job Opportunities</h2>
+    <div class="row">
+        {% if jobs %}
+            {% for job in jobs %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 job-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">{{ job.title }}</h5>
+                            <span class="badge bg-success">New</span>
+                        </div>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ job.company.company_name }}</h6>
+                        
+                        <p class="card-text">{{ job.description[:150] }}...</p>
+                        
+                        <div class="mb-3">
+                            <strong>Required Skills:</strong>
+                            <p class="mb-2">{{ job.required_skills }}</p>
+                            
+                            <strong>Salary Range:</strong>
+                            <p>{{ job.salary_range }}</p>
+                        </div>
+                        
+                        {% if current_user.is_authenticated and current_user.role == 'student' %}
+                            <a href="{{ url_for('main.apply_job', job_id=job.id) }}" 
+                               class="btn btn-primary">Apply Now</a>
+                        {% elif not current_user.is_authenticated %}
+                            <a href="{{ url_for('main.login') }}" class="btn btn-primary">Login to Apply</a>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer text-muted">
+                        Posted {{ job.created_at.strftime('%Y-%m-%d') }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="text-center mt-4">
+                <a href="{{ url_for('main.jobs') }}" class="btn btn-outline-primary btn-lg">View All Jobs</a>
+            </div>
+        {% else %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No jobs available at the moment.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="bg-light py-5 mt-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose Us</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="text-center">
+                    <i class="fas fa-search fa-3x mb-3 text-primary"></i>
+                    <h4>Easy Job Search</h4>
+                    <p>Find relevant job opportunities quickly with our advanced search and filtering options.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="text-center">
+                    <i class="fas fa-building fa-3x mb-3 text-primary"></i>
+                    <h4>Top Companies</h4>
+                    <p>Connect with leading companies looking for talented professionals like you.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="text-center">
+                    <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+                    <h4>Career Growth</h4>
+                    <p>Take the next step in your career with opportunities that match your skills and aspirations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h2>Ready to Start Your Career Journey?</h2>
+            <p class="lead mb-4">Join our platform today and connect with opportunities that match your potential.</p>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('main.register') }}" class="btn btn-primary btn-lg">Get Started</a>
+            {% else %}
+                <a href="{{ url_for('main.jobs') }}" class="btn btn-primary btn-lg">Browse Jobs</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
